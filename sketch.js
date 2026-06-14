@@ -10,9 +10,17 @@ let car2X = 50;
 let car2Y = 320;
 let car2Angle = 0;
 let car2Spin = 0;
+let winnerId = 0;
+let startX, startY;
 
 function setup() {
     createCanvas(800, 600);
+    startX = map(0, 0, prices.length - 1, 50, 750);
+    startY = map(prices[0], min(prices), max(prices), 500, 100);
+    carX = startX;
+    carY = startY;
+    car2X = startX;
+    car2Y = startY;
 }
 
 function draw() {
@@ -20,6 +28,8 @@ function draw() {
 
     if (gameState === "menu") {
         showMenu();
+    } else if (gameState === "winner") {
+        showWinner();
     } else {
         showGame();
     }
@@ -33,6 +43,36 @@ function showMenu() {
     textSize(24);
     text("Press 1 for 1 Player", 400, 300);
     text("Press 2 for 2 Players", 400, 350);
+}
+
+function showWinner() {
+    background(30);
+    textAlign(CENTER, CENTER);
+    textSize(52);
+    fill(winnerId === 1 ? color (220, 60, 60) : color (60, 130, 220));
+    text("Player " + winnerId + "Wins!", width/2, 250);
+    fill(255);
+    textSize(20);
+    text("R = race again    M = menu", width/2, 330);
+}
+
+function drawFinishLine(){
+    let endX = map(prices.length - 1, 0, prices.length - 1, 50, 750);
+    stroke (255);
+    strokeWeight (3);
+    line(endX, 0, endX, height);
+}
+
+function checkFinish() {
+    let endX = map(prices.length - 1, 0, prices.length - 1, 50, 750);
+    if (carX >= endX){
+        winnerId = 1;
+        gameState = "winner";
+    }
+    if (numPlayers === 2 && car2X >= endX){
+        winnerId = 2;
+        gameState = "winner";
+    }
 }
 
 function showGame() {
@@ -50,6 +90,9 @@ function showGame() {
             line(x, y, x2, y2);
         }
     }
+
+    drawFinishLine();
+    checkFinish();
 
     moveCar();
     push();
@@ -74,8 +117,40 @@ function showGame() {
 
 function keyPressed() {
     if (gameState === "menu") {
-        if (key === "1") { numPlayers = 1; gameState = "playing"; }
-        if (key === "2") { numPlayers = 2; gameState = "playing"; }
+        if (key === "1") {
+            numPlayers = 1;
+            gameState = "playing";
+        }
+        if (key === "2") {
+            numPlayers = 2;
+            gameState = "playing";
+        }
+    }
+    if (gameState === "winner") {
+        if (key === "r" || key === "R") {
+            carX = startX;
+            carY = startY;
+            carAngle = 0;
+            carSpin = 0;
+            car2X = startX;
+            car2Y = startY + 20;
+            car2Angle = 0;
+            car2Spin = 0;
+            winnderId = 0;
+            gameState = "playing";
+        }
+        if (key === "m" || key === "M") {
+            carX = startX;
+            carY = startY;
+            carAngle = 0;
+            carSpin = 0;
+            car2X = startX;
+            car2Y = startY + 20;
+            car2Angle = 0;
+            car2Spin = 0;
+            winnerId = 0;
+            gameState = "menu";
+        }
     }
 }
 
